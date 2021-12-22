@@ -1,5 +1,6 @@
 const express = require('express');
 const dotEnv = require('dotenv');
+const cors = require('cors');
 
 const app = express();
 
@@ -12,6 +13,8 @@ dotEnv.config();
 
 //middleware
 app.use(express.json());
+app.use(cors());
+app.options('*', cors());
 
 //Routes middleware
 app.use('/api/user', authRoute);

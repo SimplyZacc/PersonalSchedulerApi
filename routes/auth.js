@@ -43,13 +43,19 @@ router.post('/register', function(req, res) {
     }
 });
 
-router.get('/login', function(req, res) {
+router.post('/login', function(req, res) {
     try {
         var username = req.body.username;
         var password = req.body.password;
-        if (username == null || password == null) {
+        if (username == null) {
             res.send({
-                'message': 'Please enter valid info.',
+                'message': 'Please enter username',
+                'data': req.body,
+                'status': false,
+            });
+        } else if (password == null) {
+            res.send({
+                'message': 'Please enter password',
                 'data': null,
                 'status': false,
             });
