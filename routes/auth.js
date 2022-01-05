@@ -50,7 +50,7 @@ router.post('/login', function(req, res) {
         if (username == null) {
             res.send({
                 'message': 'Please enter username',
-                'data': req.body,
+                'data': null,
                 'status': false,
             });
         } else if (password == null) {
@@ -71,7 +71,7 @@ router.post('/login', function(req, res) {
                 });
             } else if (!(result.length > 0)) {
                 res.send({
-                    'message': 'Signed in Unuccessful',
+                    'message': 'Sign in Unuccessful',
                     'data': null,
                     'status': false,
                 });
@@ -87,7 +87,10 @@ router.post('/login', function(req, res) {
                     const token = jwt.sign({ _id: result[0].id, roles: ['a', 'b'], }, process.env.Token_Secret);
                     res.header('auth-token', token).send({
                         'message': 'Signed in Successfully',
-                        'data': token,
+                        'data': {
+                            'token': token,
+                            'name': result[0].username
+                        },
                         'status': true,
                     });
                 }
