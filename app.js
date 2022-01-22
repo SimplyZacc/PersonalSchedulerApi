@@ -20,6 +20,6 @@ app.options('*', cors());
 app.use('/api/user', authRoute);
 app.use('/api/event', eventRoute);
 
-app.listen(3000, function() {
+app.listen(3000, '0.0.0.0', function() {
     console.log('Server is up and running!');
 });

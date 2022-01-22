@@ -1,9 +1,11 @@
 const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { connection } = require('../db_conn');
+const models = require("../models");
 
-router.post('/register', function(req, res) {
+const User = models.User;
+
+router.post('/register', function (req, res) {
     try {
         var username = req.body.username;
         var password = req.body.password;
@@ -18,22 +20,35 @@ router.post('/register', function(req, res) {
         const salt = bcrypt.genSaltSync(10);
         const hashedPass = bcrypt.hashSync(password, salt);
 
-        const sql = "INSERT INTO users (Username, Password) VALUES ('" + username + "','" + hashedPass + "')";
-        connection.query(sql, function(err, result, fields) {
-            if (err) {
+        const user = User.create({
+            userName: username,
+            password: hashedPass,
+            email: "Test",
+            createdAt: new Date(),
+            updatedAt: new Date()
+        }).then(function (user) {
+            if (user) {
                 res.send({
-                    'message': 'An error has occured please try again later',
-                    'data': err,
-                    'status': false,
-                });
-            } else {
-                res.send({
-                    'message': 'User Registered Successfully',
-                    'data': null,
+                    'message': 'Successful',
+                    'data': user,
                     'status': true,
                 });
+
+            } else {
+                res.send({
+                    'message': 'Unsuccessful',
+                    'data': null,
+                    'status': false,
+                });
+
             }
-        });
+        }).catch(function (err) {
+            res.send({
+                'message': 'Unsuccessful',
+                'data': err,
+                'status': false,
+            });
+        })
     } catch (error) {
         res.send({
             'message': 'Something went wrong please try again later.',
@@ -43,7 +58,7 @@ router.post('/register', function(req, res) {
     }
 });
 
-router.post('/login', function(req, res) {
+router.post('/login', function (req, res) {
     try {
         var username = req.body.username;
         var password = req.body.password;
@@ -61,22 +76,13 @@ router.post('/login', function(req, res) {
             });
         }
 
-        const sql = "SELECT * FROM users WHERE username='" + username + "'";
-        connection.query(sql, async function(err, result, fields) {
-            if (err) {
-                res.send({
-                    'message': 'Something went wrong please try again later.',
-                    'data': err,
-                    'status': false,
-                });
-            } else if (!(result.length > 0)) {
-                res.send({
-                    'message': 'Sign in Unuccessful',
-                    'data': null,
-                    'status': false,
-                });
-            } else {
-                const validPass = bcrypt.compareSync(password, result[0].password);
+        const user = User.findAll({
+            where: {
+                userName: username
+            }
+        }).then(function (user) {
+            if (user) {
+                const validPass = bcrypt.compareSync(password, user[0].password);
                 if (!validPass) {
                     res.send({
                         'message': 'Username or Password Incorrect',
@@ -84,18 +90,37 @@ router.post('/login', function(req, res) {
                         'status': false,
                     });
                 } else {
-                    const token = jwt.sign({ _id: result[0].id, roles: ['a', 'b'], }, process.env.Token_Secret);
+                    const token = jwt.sign({
+                        _id: user[0].id,
+                        roles: ['a', 'b'],
+                    }, process.env.Token_Secret);
+
                     res.header('auth-token', token).send({
                         'message': 'Signed in Successfully',
                         'data': {
                             'token': token,
-                            'name': result[0].username
+                            'name': user[0].userName
                         },
                         'status': true,
                     });
                 }
+
+            } else {
+                res.send({
+                    'message': 'Username or Password Incorrect',
+                    'data': null,
+                    'status': false,
+                });
+
             }
+        }).catch(function (err) {
+            res.send({
+                'message': 'Something went wrong please try again latera.',
+                'data': err,
+                'status': false,
+            });
         });
+
     } catch (error) {
         res.send({
             'message': 'Something went wrong please try again later.',
