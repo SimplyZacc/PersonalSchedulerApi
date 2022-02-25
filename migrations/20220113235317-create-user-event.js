@@ -9,25 +9,28 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       userId: {
-        allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: 'User',
+          model: 'Users',
           key: 'id'
         },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
       },
       eventId: {
-        allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: 'Event',
+          model: 'Events',
           key: 'id'
         },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
       },
+      status: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -11,9 +11,19 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      // this.belongsToMany(models.Event, {
+      //   through: 'userevents', 
+      //   foreignKey: 'eventId',
+      // });
     }
   };
   User.init({
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
+    },
     userName: DataTypes.STRING,
     password: DataTypes.STRING,
     email: DataTypes.STRING
@@ -21,6 +31,6 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'User',
   });
-  
+
   return User;
 };

@@ -19,7 +19,7 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
-        isEmail: true,            // checks for email format (foo@bar.com)
+        isEmail: true, // checks for email format (foo@bar.com)
         unique: true,
         allowNull: true,
       },
